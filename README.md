@@ -14,5 +14,24 @@
 
 <br><br>
 
+## 개발 환경
+Language: Python 3.9.12
+
+Library
+
+    + numpy 1.23.2
+    + pandas 1.5.2
+    + pybullet 3.2.5
+    + pytorch 1.12.0
+
+PC
+
+    + OS: window 10 64bit
+    + CPU: AMD Ryzen 9 5900x
+    + RAM: DDR 4 32GB
+    + GPU: NVIDIA Geforce RTX 3090 Ti(×1)
+
+<br><br>
+
 ## License
 This project is licensed under the terms of the [MIT license](https://github.com/YAGI0423/DDPG/blob/main/LICENSE).
