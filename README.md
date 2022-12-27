@@ -14,17 +14,26 @@
 
 <br><br>
 
+## Getting Start
+* `pybullet` 라이브러리를 받기 위해선 `Visual Studio c++`가 우선적으로 설치되어 있어야 합니다.
+* `gym` 라이브러리 버전은 반드시 `0.10.4`로 맞춰 주세요.
+
+<br><br>
+
 ## 개발 환경
-Language: Python 3.9.12
+**Language**: Python 3.9.12
 
-Library
+**Library**
 
+    + gym 0.10.4
     + numpy 1.23.2
     + pandas 1.5.2
     + pybullet 3.2.5
     + pytorch 1.12.0
 
-PC
+<br>
+
+**PC**
 
     + OS: window 10 64bit
     + CPU: AMD Ryzen 9 5900x
