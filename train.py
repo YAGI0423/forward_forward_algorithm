@@ -37,7 +37,7 @@ def replayOneEpisod(env, actor, buffer, action_size:int, device):
             action = action.numpy()
 
             if action_size is not None:
-                action += np.random.randn(action_size)
+                action += np.random.randn(action_size) * LAMBDA
             action = action.clip(-1., 1.)
             state_n, reward, done, _ = env.step(action)
 
@@ -85,11 +85,11 @@ def update_actor(actor, critic, act_opt, buf):
 ENV_ID = 'MinitaurBulletEnv-v0'
 RENDER = True
 
-LEARNING_RATE = 0.0001
-BATCH_SIZE = 128
+LEARNING_RATE = 0.001
+BATCH_SIZE = 32
 
 
-LAMBDA = 0.05
+LAMBDA = 0.4
 GAMMA = 0.99 #discount factor
 TAU = 0.001
 
