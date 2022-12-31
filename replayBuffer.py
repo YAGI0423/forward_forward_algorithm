@@ -3,12 +3,7 @@ import numpy as np
 
 class Buffer:
     def __init__(self, buffer_size: int, batch_size: int=1, device='cpu'):
-        self.__buf = {
-            'state': [],
-            'action': [],
-            'reward': [],
-            'state_n': [],
-        }
+        self.__buf = {'state': [], 'action': [], 'reward': [], 'state_n': [],}
         self.buffer_size = buffer_size
         self.batch_size = batch_size
         self.device = device
