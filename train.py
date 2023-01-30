@@ -97,7 +97,6 @@ ACT_SIZE = 8
 
 device = 'cuda'
 
-
 if __name__ == '__main__':
     spec = gym.envs.registry.spec(ENV_ID)
     spec._kwargs['render'] = RENDER
