@@ -1,4 +1,4 @@
-### 이 저장소(Repository)는 「DDPG(Deep Deterministic Policy Gradient) 알고리즘 구현」에 대한 내용을 다루고 있습니다.
+### 이 저장소(Repository)는 「D4PG(DISTRIBUTED DISTRIBUTIONAL DETERMINISTIC POLICY GRADIENTS) 알고리즘 구현」에 대한 내용을 다루고 있습니다.
 
 ***
 작성자: YAGI<br>
@@ -43,4 +43,4 @@
 <br><br>
 
 ## License
-This project is licensed under the terms of the [MIT license](https://github.com/YAGI0423/DDPG/blob/main/LICENSE).
+This project is licensed under the terms of the [MIT license](https://github.com/YAGI0423/D4PG/blob/main/LICENSE).
