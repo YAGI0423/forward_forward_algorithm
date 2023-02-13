@@ -1,9 +1,6 @@
 import gym
 import pybullet_envs
 
-import models
-import replayBuffer
-
 import numpy as np
 from copy import deepcopy
 import matplotlib.pyplot as plt
