@@ -1,6 +1,3 @@
-import gym
-import pybullet_envs
-
 import numpy as np
 from copy import deepcopy
 import matplotlib.pyplot as plt
