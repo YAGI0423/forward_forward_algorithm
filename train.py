@@ -44,15 +44,6 @@ def replayOneEpisod(env, actor, buffer, action_size:int, device):
             rewardByEpi += reward
     return time_step, rewardByEpi
 
-# def distr_projection(q_ii, reward, is_done, gamma, device:str='cpu'):
-#     batch_size = reward.size(0)
-    
-#     atom_tens = torch.arange(N_ATOMS, dtype=torch.float32, device=device).unsqueeze(0).repeat(batch_size, 1)
-
-#     tz_j = torch.maximum(torch.full((batch_size, 1), V_MIN, device=device), reward + (V_MIN + atom_tens * DELTA_Z) * gamma)
-#     tz_j = torch.minimum(torch.full((batch_size, 1), V_MAX, device=device), tz_j)
-#     b_j = (tz_j - V_MIN) / DELTA_Z
-    
 def distr_projection(next_distr_v, rewards_v, dones_mask_t, gamma, device="cpu"):
     next_distr = next_distr_v.data.cpu().numpy()
     rewards = rewards_v.data.cpu().numpy()
