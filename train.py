@@ -124,31 +124,6 @@ def update_actor(actor, critic, act_opt, buf):
     return loss.item()
 
 
-ENV_ID = 'MinitaurBulletEnv-v0'
-RENDER = False
-
-EPOCH = 1000
-LEARNING_RATE = 0.00005
-BATCH_SIZE = 384
-WEIGHT_DECAY = 0.001
-
-
-BUFFER_SIZE = 10**6
-REPLAY_INITIAL = 10000
-
-
-LAMBDA = 0.3
-GAMMA = 0.99 #discount factor
-TAU = 0.001
-
-
-ACT_SIZE = 8
-
-N_ATOMS = 51
-V_MIN, V_MAX = -10., 10.
-REWRAD_STEP = 5
-DELTA_Z = (V_MAX - V_MIN) / (N_ATOMS - 1)
-
 device = 'cuda'
 
 his_r, his_act, his_cri = list(), list(), list()
