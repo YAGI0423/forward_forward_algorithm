@@ -45,22 +45,6 @@ def replayOneEpisod(env, actor, buffer, action_size:int, device):
     return time_step, rewardByEpi
 
 if __name__ == '__main__':
-    spec = gym.envs.registry.spec(ENV_ID)
-    spec._kwargs['render'] = RENDER
-    env = gym.make(ENV_ID)
-
-    buffer = replayBuffer.Buffer(buffer_size=BUFFER_SIZE, batch_size=BATCH_SIZE, device=device)
-
-    actor = models.Actor(input_shape=28, output_shape=ACT_SIZE).to(device)
-    critic = models.Critic(state_shape=28, act_size=ACT_SIZE, n_atoms=N_ATOMS, v_min=V_MIN, v_max=V_MAX).to(device)
-    tg_actor, tg_critic = deepcopy(actor).to(device), deepcopy(critic).to(device)
-
-    # act_opt = optim.SGD(actor.parameters(), lr=LEARNING_RATE, weight_decay=1e-6, momentum=0.9)
-    # crt_opt = optim.SGD(critic.parameters(), lr=LEARNING_RATE, weight_decay=1e-6, momentum=0.9)
-
-    act_opt = optim.Adam(actor.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
-    crt_opt = optim.Adam(critic.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
-    
     ep = 0
     while True:
         LAMBDA = np.random.rand()
