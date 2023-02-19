@@ -17,42 +17,11 @@ def soft_update(origin_net, target_net, T=0.001):
     for ori_weight, target_weight in zip(origin_net.parameters(), target_net.parameters()):
         target_weight.data.copy_(T * ori_weight.data + (1. - T) * target_weight.data)
 
-def replayOneEpisod(env, actor, buffer, action_size:int, device):
-    state = env.reset()
-    done = False
-    
-    time_step, rewardByEpi = 0, 0
-    actor.eval()
-    with torch.no_grad():
-        while not done:
-            action = actor(toTensor(state).to(device))
-            action = action.detach()
-            if device == 'cuda':
-                action = action.cpu()
-            action = action.numpy()
-
-            if action_size is not None:
-                action += np.random.randn(action_size) * LAMBDA
-            action = action.clip(-1., 1.)
-            state_n, reward, done, _ = env.step(action)
-
-            if buffer is not None:
-                buffer.add_buffer(state=state, action=action, reward=reward.reshape(-1), state_n=state_n, done=done)
-            state = state_n.copy()
-
-            time_step += 1
-            rewardByEpi += reward
-    return time_step, rewardByEpi
-
 if __name__ == '__main__':
     ep = 0
     while True:
         LAMBDA = np.random.rand()
         ep += 1
-
-        #collect buffer++++++++++++++++++++++++++
-        time_step, rewards = replayOneEpisod(env, actor, buffer, action_size=ACT_SIZE, device=device)
-        #End+++++++++++++++++++++++++++++++++++++
 
         if buffer.size() < REPLAY_INITIAL:
             continue
