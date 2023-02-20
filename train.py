@@ -26,17 +26,6 @@ if __name__ == '__main__':
         if buffer.size() < REPLAY_INITIAL:
             continue
 
-        #train model+++++++++++++++++++++++++++++
-        buffer.update()
-        buf = buffer.get_batch()
-        
-        cri_loss = update_critic(critic, tg_critic, tg_actor, crt_opt, buf)
-        act_loss = update_actor(actor, critic, act_opt, buf)
-
-
-        soft_update(actor, tg_actor, T=TAU)
-        soft_update(critic, tg_critic, T=TAU)
-        #End+++++++++++++++++++++++++++++++++++++
 
         print(f'({ep} / ∞) Reward: {rewards:.3f}, times: {time_step}, Cri: {cri_loss:.3f}, Act: {act_loss:.3f}')
 
