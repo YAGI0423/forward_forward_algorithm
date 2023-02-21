@@ -23,10 +23,6 @@ if __name__ == '__main__':
         LAMBDA = np.random.rand()
         ep += 1
 
-        if buffer.size() < REPLAY_INITIAL:
-            continue
-
-
         print(f'({ep} / ∞) Reward: {rewards:.3f}, times: {time_step}, Cri: {cri_loss:.3f}, Act: {act_loss:.3f}')
 
         his_r.append(rewards)
