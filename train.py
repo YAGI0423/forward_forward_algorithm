@@ -25,10 +25,6 @@ if __name__ == '__main__':
 
         print(f'({ep} / ∞) Reward: {rewards:.3f}, times: {time_step}, Cri: {cri_loss:.3f}, Act: {act_loss:.3f}')
 
-        his_r.append(rewards)
-        his_act.append(act_loss)
-        his_cri.append(cri_loss)
-
         #Test++++++++++++++++++++++++++++++++++++
         if ep % 10 == 0:
             test_time_step, test_rewards = replayOneEpisod(env, actor, buffer=None, action_size=None, device=device)
