@@ -23,8 +23,6 @@ if __name__ == '__main__':
         LAMBDA = np.random.rand()
         ep += 1
 
-        print(f'({ep} / ∞) Reward: {rewards:.3f}, times: {time_step}, Cri: {cri_loss:.3f}, Act: {act_loss:.3f}')
-
         #Test++++++++++++++++++++++++++++++++++++
         if ep % 10 == 0:
             test_time_step, test_rewards = replayOneEpisod(env, actor, buffer=None, action_size=None, device=device)
