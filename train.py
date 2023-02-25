@@ -20,8 +20,6 @@ def soft_update(origin_net, target_net, T=0.001):
 if __name__ == '__main__':
     ep = 0
     while True:
-        LAMBDA = np.random.rand()
-        ep += 1
 
         #Test++++++++++++++++++++++++++++++++++++
         if ep % 10 == 0:
