@@ -28,6 +28,5 @@ if __name__ == '__main__':
 
             save_his(his_r, his_act, his_cri)
         #End+++++++++++++++++++++++++++++++++++++
-        print('=' * 100)
 
     
