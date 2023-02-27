@@ -26,7 +26,6 @@ if __name__ == '__main__':
             test_time_step, test_rewards = replayOneEpisod(env, actor, buffer=None, action_size=None, device=device)
             print(f'\nTEST Reward: {test_rewards:.3f}, times: {test_time_step}')
 
-            save_his(his_r, his_act, his_cri)
         #End+++++++++++++++++++++++++++++++++++++
 
     
