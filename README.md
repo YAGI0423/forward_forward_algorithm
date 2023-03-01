@@ -1,15 +1,15 @@
-### 이 저장소(Repository)는 「D4PG(DISTRIBUTED DISTRIBUTIONAL DETERMINISTIC POLICY GRADIENTS) 알고리즘 구현」에 대한 내용을 다루고 있습니다.
+### 이 저장소(Repository)는 「Forward-Forward 알고리즘 구현」에 대한 내용을 다루고 있습니다.
 
 ***
 작성자: YAGI<br>
 
-최종 수정일: 2022-12-27
+최종 수정일: 2023-03-01
 ***
 
 <br>
 
 ***
-+ 프로젝트 기간: 2022-12-27 ~ (진행 중)
++ 프로젝트 기간: 2023-03-01 ~ (진행 중)
 ***
 
 <br><br>
@@ -31,16 +31,7 @@
     + pybullet 3.2.5
     + pytorch 1.12.0
 
-<br>
-
-**PC**
-
-    + OS: window 10 64bit
-    + CPU: AMD Ryzen 9 5900x
-    + RAM: DDR 4 32GB
-    + GPU: NVIDIA Geforce RTX 3090 Ti(×1)
-
 <br><br>
 
 ## License
-This project is licensed under the terms of the [MIT license](https://github.com/YAGI0423/D4PG/blob/main/LICENSE).
+This project is licensed under the terms of the [MIT license](https://github.com/YAGI0423/forward_forward_algorithm/blob/main/LICENSE).
