@@ -9,7 +9,6 @@ def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Argument Help')
     parser.add_argument('--mode', type=str, default='INFERENCE', choices=('TRAIN', 'INFERENCE'))
     parser.add_argument('--dims', type=int, default=[28*28, 50], nargs='+')
-    parser.add_argument('--epoch', type=int, default=1)
     return parser.parse_args()
 
 

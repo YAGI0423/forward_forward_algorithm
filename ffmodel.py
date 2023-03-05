@@ -49,9 +49,7 @@ class FFLinear(nn.Linear):
 class FFModel(nn.Module):
     def __init__(self, dims: list) -> None:
         super(FFModel, self).__init__()
-        self.layers = nn.Sequential(
-            *tuple(nn.Linear(dims[dim], dims[dim+1]) for dim in range(len(dims)-1))
-        )
+        self.layers = tuple(FFLinear(dims[dim], dims[dim+1]) for dim in range(len(dims)-1))
 
     def forward(self, input: Tensor) -> Tensor:
         pass
