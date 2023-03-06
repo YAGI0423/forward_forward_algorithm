@@ -3,18 +3,20 @@ from torch import nn
 from torch import Tensor
 from torch.nn import functional as F
 
+
 class FFLinear(nn.Linear):
     __constants__ = ('in_features', 'out_features')
     in_features: int
     out_features: int
     weight: Tensor
         
-    def __init__(self, in_feature: int, out_features: int, bias: bool=True, device=None, dtype=None) -> None:
+    def __init__(self, in_feature: int, out_features: int, optimizer: torch.optim, lr: float,
+                 bias: bool=True, device=None, dtype=None) -> None:
         factory_kwargs = {'device': device, 'dtype': dtype}
         super(FFLinear, self).__init__(in_feature, out_features, bias, **factory_kwargs)
         
         self.activation = nn.ReLU()
-        self.optim = torch.optim.SGD(self.parameters(), lr=0.1)
+        self.optim = optimizer(self.parameters(), lr=lr)
         self.threshold = 2.0
         
     def forward(self, input) -> Tensor:
@@ -47,9 +49,23 @@ class FFLinear(nn.Linear):
     
     
 class FFModel(nn.Module):
-    def __init__(self, dims: list) -> None:
+    def __init__(self, dims: list, optimizer, lr) -> None:
         super(FFModel, self).__init__()
-        self.layers = tuple(FFLinear(dims[dim], dims[dim+1]) for dim in range(len(dims)-1))
+        self.layers = tuple(
+            FFLinear(dims[dim], dims[dim+1], optimizer, lr) for dim in range(len(dims)-1)
+        )
 
     def forward(self, input: Tensor) -> Tensor:
-        pass
+        batch_size = input.size(0)
+        goodness = torch.zeros(batch_size)
+
+        out = input
+        for layer in self.layers:
+            out = layer(out)
+            goodness += out.pow(exponent=2).mean(dim=1)
+        return goodness
+    
+    def update(self, pos_x: Tensor, neg_x: Tensor) -> None:
+        pos_out, neg_out = pos_x, neg_x
+        for layer in self.layers:
+            pos_out, neg_out = layer.update(pos_out, neg_out)

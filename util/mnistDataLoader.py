@@ -4,7 +4,7 @@ from torch.utils.data import DataLoader
 from torchvision.transforms import Compose, ToTensor, Normalize, Lambda
 
 
-def mnist_loader(train: bool, batch_size: int) -> DataLoader:
+def get_loader(train: bool, batch_size: int) -> DataLoader:
     '''
     pytorch MNIST train & test 데이터 로더 반환
     + z-normalization
