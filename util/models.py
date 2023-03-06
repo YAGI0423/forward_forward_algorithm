@@ -1,15 +1,14 @@
-import torch
 import torch. nn as nn
-from torch.nn import functional as F
+from torch import optim
 
 from torch import Tensor
 
 class BPModel(nn.Module):
-    def __init__(self, dims: list, optimizer, lr) -> None:
+    def __init__(self, dims: list, optimizer: optim, lr: float) -> None:
         super(BPModel, self).__init__()
 
         self.layers = nn.Sequential(*self.__get_layers(dims))
-        self.optim = optimizer(self.parameters(), lr=lr)
+        self.optimizer = optimizer(self.parameters(), lr=lr)
 
     def forward(self, input: Tensor) -> Tensor:
         return self.layers(input)

@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+from torch import optim
 from torch import Tensor
 from torch.nn import functional as F
 
@@ -49,7 +50,7 @@ class FFLinear(nn.Linear):
     
     
 class FFModel(nn.Module):
-    def __init__(self, dims: list, optimizer, lr) -> None:
+    def __init__(self, dims: list, optimizer: optim, lr: float) -> None:
         super(FFModel, self).__init__()
         self.layers = tuple(
             FFLinear(dims[dim], dims[dim+1], optimizer, lr) for dim in range(len(dims)-1)

@@ -24,18 +24,28 @@ def get_optim(args) -> optim:
         return optim.SGD
     return optim.Adam
 
+def inference(model, dataLoader, loss_fc, device: str):
+    model.eval()
+    with torch.no_grad():
+        for x, y in dataLoader:
+            x, y = x.to(device), y.to(device)
+            
+
+            raise
 
 if __name__ == '__main__':
+    args = get_args()
     FF_PATH = './model/ff_model.pk'
     BP_PATH = './model/bp_model.pk'
+    FIGURE_PATH = './figures/'
+    DEVICE = args.device.lower()
 
-
-    args = get_args()
     print(f'MODEL SHAPE: {args.dims}')
 
-    ff_model = ffmodel.FFModel(dims=args.dims, optimizer=get_optim(args), lr=args.lr)
-    bp_model = models.BPModel(dims=args.dims, optimizer=get_optim(args), lr=args.lr)
-
+    ff_model = ffmodel.FFModel(dims=args.dims, optimizer=get_optim(args), lr=args.lr).to(DEVICE)
+    bp_model = models.BPModel(dims=args.dims, optimizer=get_optim(args), lr=args.lr).to(DEVICE)
+    loss_function = torch.nn.MSELoss()
+    
 
     if args.mode == 'INFERENCE': #INFERENCE
         if os.path.isfile(FF_PATH):
@@ -46,6 +56,8 @@ if __name__ == '__main__':
 
         test_dataLoader = mnistDataLoader.get_loader(train=False, batch_size=args.test_batch_size)
 
+        inference(bp_model, test_dataLoader, loss_fc=loss_function, device=DEVICE)
+        raise
 
     elif args.mode == 'TRAIN': #TRAIN
         print('train')
