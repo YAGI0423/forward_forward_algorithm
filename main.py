@@ -2,6 +2,7 @@ import os
 import argparse
 
 import torch
+from torch import nn
 from torch import optim
 
 from util import mnistDataLoader, models
@@ -24,6 +25,14 @@ def get_optim(args) -> optim:
         return optim.SGD
     return optim.Adam
 
+def load_model(model: nn.Module, path: str) -> bool:
+    if os.path.isfile(path):
+        print(f'load model from {path}...')
+        model.load_state_dict(torch.load(path))
+        return True
+    print(f'no model in {path}...')
+    return False
+
 def inference(model, dataLoader, device: str):
     model.eval()
     with torch.no_grad():
@@ -41,19 +50,15 @@ if __name__ == '__main__':
     FIGURE_PATH = './figures/'
     DEVICE = args.device.lower()
 
-    print(f'MODEL SHAPE: {args.ff_dims}, {args.bp_dims}')
+    print(f'+ MODEL SHAPE\n\tFF-Model:  {args.ff_dims}\n\tBP-Model:  {args.bp_dims}', end='\n\n')
 
     ff_model = models.FFModel(dims=args.ff_dims, optimizer=get_optim(args), lr=args.lr, device=DEVICE)
     bp_model = models.BPModel(dims=args.bp_dims, optimizer=get_optim(args), lr=args.lr, device=DEVICE)
     loss_function = torch.nn.MSELoss()
     
-
     if args.mode == 'INFERENCE': #INFERENCE
-        if os.path.isfile(FF_PATH):
-            ff_model.load_state_dict(torch.load(FF_PATH))
-
-        if os.path.isfile(BP_PATH):
-            bp_model.load_state_dict(torch.load(BP_PATH))
+        load_model(ff_model, FF_PATH)
+        load_model(bp_model, BP_PATH)
 
         test_dataLoader = mnistDataLoader.get_loader(train=False, batch_size=args.test_batch_size)
 
