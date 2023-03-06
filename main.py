@@ -33,15 +33,19 @@ def load_model(model: nn.Module, path: str) -> bool:
     print(f'no model in {path}...')
     return False
 
-def inference(model, dataLoader, device: str):
-    model.eval()
+def inference(ff_model, bp_model, dataLoader, device: str) -> tuple[list, list]:
+    ff_acc, bp_acc = list(), list()
+
+    ff_model.eval()
+    bp_model.eval()
     with torch.no_grad():
         for x, y in dataLoader:
             x, y = x.to(device), y.to(device)
-            
-            y_hat = model.inference(x)
-            
-            raise
+
+            ff_y_hat = ff_model.inference(x).argmax(dim=1)
+            bp_y_hat = bp_model.inference(x).argmax(dim=1)
+    return ff_acc, bp_acc
+
 
 if __name__ == '__main__':
     args = get_args()
@@ -50,30 +54,19 @@ if __name__ == '__main__':
     FIGURE_PATH = './figures/'
     DEVICE = args.device.lower()
 
-    print(f'+ MODEL SHAPE\n\tFF-Model:  {args.ff_dims}\n\tBP-Model:  {args.bp_dims}', end='\n\n')
 
+    print(f'+ MODEL SHAPE\n\tFF-Model:  {args.ff_dims}\n\tBP-Model:  {args.bp_dims}', end='\n\n')
     ff_model = models.FFModel(dims=args.ff_dims, optimizer=get_optim(args), lr=args.lr, device=DEVICE)
     bp_model = models.BPModel(dims=args.bp_dims, optimizer=get_optim(args), lr=args.lr, device=DEVICE)
-    loss_function = torch.nn.MSELoss()
+
     
     if args.mode == 'INFERENCE': #INFERENCE
         load_model(ff_model, FF_PATH)
         load_model(bp_model, BP_PATH)
 
         test_dataLoader = mnistDataLoader.get_loader(train=False, batch_size=args.test_batch_size)
-
-        ff_model.eval()
-        bp_model.eval()
-        with torch.no_grad():
-            for x, y in test_dataLoader:
-                x, y = x.to(DEVICE), y.to(DEVICE)
-
-                ff_y_hat = ff_model.inference(x).argmax(dim=1)
-                bp_y_hat = bp_model.inference(x).argmax(dim=1)
-
-                
-
-        inference(ff_model, test_dataLoader, device=DEVICE)
+        ff_acc, bp_acc = inference(ff_model, bp_model, test_dataLoader, device=DEVICE)
+        print(ff_acc, bp_acc)
         raise
 
     elif args.mode == 'TRAIN': #TRAIN

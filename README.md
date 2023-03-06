@@ -25,11 +25,9 @@
 
 **Library**
 
-    + gym 0.10.4
-    + numpy 1.23.2
-    + pandas 1.5.2
-    + pybullet 3.2.5
+    + matplotlib 3.6.2
     + pytorch 1.12.0
+    + tqdm 4.64.1
 
 <br><br>
 

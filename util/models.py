@@ -46,7 +46,6 @@ class FFModel(FFM):
         goodness = self.forward(input_).view(batch_size, -1)
         return goodness
 
-
     def __combine_xy(self, x: Tensor, y: Tensor) -> Tensor:
         '''
         forward-forward Model 입력 데이터 반환
