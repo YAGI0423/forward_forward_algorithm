@@ -48,17 +48,18 @@ class FFLinear(nn.Linear):
         var_ = input.var(dim=1, keepdim=True, unbiased=False) #unbiased True=(N-1), False=N
         return (input - mean_) / torch.sqrt(var_ + eps)
     
-    
+
 class FFModel(nn.Module):
-    def __init__(self, dims: list, optimizer: optim, lr: float) -> None:
+    def __init__(self, dims: list, optimizer: optim, lr: float,
+                 bias: bool=True, device=None, dtype=None) -> None:
         super(FFModel, self).__init__()
         self.layers = tuple(
-            FFLinear(dims[dim], dims[dim+1], optimizer, lr) for dim in range(len(dims)-1)
+            FFLinear(dims[dim], dims[dim+1], optimizer, lr, bias, device, dtype) for dim in range(len(dims)-1)
         )
 
     def forward(self, input: Tensor) -> Tensor:
         batch_size = input.size(0)
-        goodness = torch.zeros(batch_size)
+        goodness = torch.zeros(batch_size).to(input.device)
 
         out = input
         for layer in self.layers:
