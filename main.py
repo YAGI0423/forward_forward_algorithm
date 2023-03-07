@@ -1,5 +1,5 @@
 import os
-import tqdm
+from tqdm import tqdm
 import argparse
 
 import torch
@@ -35,24 +35,25 @@ def load_model(model: Module, path: str) -> bool:
     return False
 
 def train(ff_model: Module, bp_model: Module, dataLoader: mnistDataLoader, device: str) -> None:
+    dataset_size = dataLoader.__len__()
     ff_loss, bp_loss = list(), list()
 
     ff_model.train()
     bp_model.train()
     dataLoader = iter(dataLoader)
-    for (x0, y0), (x1, y1) in zip(dataLoader, dataLoader):
+    for (x0, y0), (x1, y1) in tqdm(zip(dataLoader, dataLoader), total=dataset_size//2):
+        #x0, y0 is for positive data
+        #x1, y1 is for negative data
         x0, y0 = x0.to(device), y0.to(device)
         x1, y1 = x1.to(device), y1.to(device)
         
         bp_loss.append(bp_model.update(x0, y0).item())
         bp_loss.append(bp_model.update(x1, y1).item())
-
-
-        print(bp_loss)
-        
-        raise
-        
-    raise
+        ff_loss.append(ff_model.update(
+            pos_x=x0, pos_y=y0, #positive data
+            neg_x=x1, neg_y=y1, #negative data
+        ))
+    
 
 def inference(ff_model: Module, bp_model: Module, dataLoader: mnistDataLoader, device: str) -> tuple[float, float]:
     ff_acc, bp_acc = list(), list()
@@ -60,7 +61,7 @@ def inference(ff_model: Module, bp_model: Module, dataLoader: mnistDataLoader, d
     ff_model.eval()
     bp_model.eval()
     with torch.no_grad():
-        for x, y in dataLoader:
+        for x, y in tqdm(dataLoader):
             x, y = x.to(device), y.to(device)
 
             ff_y_hat = ff_model.inference(x).argmax(dim=1)
@@ -92,8 +93,8 @@ if __name__ == '__main__':
         train(ff_model, bp_model, train_dataLoader, device=DEVICE)
 
     elif args.mode == 'INFERENCE':
-        print(f'\n+ Accuracy on MNIST Test Set')
         test_dataLoader = mnistDataLoader.get_loader(train=False, batch_size=args.test_batch_size)
         ff_acc, bp_acc = inference(ff_model, bp_model, test_dataLoader, device=DEVICE)
+        print(f'\n+ Accuracy on MNIST Test Set')
         print(f'\tFF Model: {ff_acc:.3f}')
         print(f'\tBP Model: {bp_acc:.3f}')

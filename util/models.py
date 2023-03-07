@@ -55,6 +55,17 @@ class FFModel(FFM):
 
         goodness = self.forward(input_).view(batch_size, -1)
         return goodness
+    
+    def update(self, pos_x: Tensor, pos_y: Tensor, neg_x: Tensor, neg_y: Tensor) -> Tensor:
+        pos_input = self.__combine_xy(pos_x, pos_y)
+        neg_input = self.__combine_xy(neg_x, neg_y)
+        
+        loss_mean = torch.tensor([0.]).to(pos_x.device)
+        pos_o, neg_o = pos_input, neg_input
+        for idx, layer in enumerate(self.layers):
+            loss, (pos_o, neg_o) = layer.update(pos_o, neg_o)
+            loss_mean += loss
+        return loss_mean / idx
 
     def __combine_xy(self, x: Tensor, y: Tensor) -> Tensor:
         '''
@@ -69,11 +80,3 @@ class FFModel(FFM):
         x_[:, :self.CLASS_NUM] = 0.
         x_[range(batch_size), y] = x_.max()
         return x_
-
-    def update(self, pos_x: Tensor, neg_x: Tensor) -> Tensor:
-        loss_mean = torch.tensor([0.]).to(pos_x.deivce)
-        pos_out, neg_out = pos_x, neg_x
-        for idx, layer in enumerate(self.layers):
-            loss, (pos_out, neg_out) = layer.update(pos_out, neg_out)
-            loss_mean += loss
-        return loss_mean / idx
