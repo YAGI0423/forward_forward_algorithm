@@ -12,6 +12,7 @@ class BPModel(nn.Module):
 
         self.layers = nn.Sequential(*self.__get_layers(dims, device))
         self.optimizer = optimizer(self.parameters(), lr=lr)
+        self.loss_fc = nn.CrossEntropyLoss()
 
     def forward(self, input: Tensor) -> Tensor:
         return self.layers(input)
@@ -24,7 +25,16 @@ class BPModel(nn.Module):
         return layers
     
     def inference(self, input: Tensor) -> Tensor:
-        return self.forward(input)
+        return self.forward(input)\
+        
+    def update(self, x: Tensor, y: Tensor) -> Tensor:
+        y_hat = self.forward(x)
+        loss = self.loss_fc(y_hat, y)
+
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+        return loss
     
 
 class FFModel(FFM):
@@ -59,3 +69,11 @@ class FFModel(FFM):
         x_[:, :self.CLASS_NUM] = 0.
         x_[range(batch_size), y] = x_.max()
         return x_
+
+    def update(self, pos_x: Tensor, neg_x: Tensor) -> Tensor:
+        loss_mean = torch.tensor([0.]).to(pos_x.deivce)
+        pos_out, neg_out = pos_x, neg_x
+        for idx, layer in enumerate(self.layers):
+            loss, (pos_out, neg_out) = layer.update(pos_out, neg_out)
+            loss_mean += loss
+        return loss_mean / idx

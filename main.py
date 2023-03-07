@@ -1,9 +1,10 @@
 import os
+import tqdm
 import argparse
 
 import torch
-from torch import nn
 from torch import optim
+from torch.nn import Module
 
 from util import mnistDataLoader, models
 
@@ -25,15 +26,35 @@ def get_optim(args) -> optim:
         return optim.SGD
     return optim.Adam
 
-def load_model(model: nn.Module, path: str) -> bool:
+def load_model(model: Module, path: str) -> bool:
     if os.path.isfile(path):
-        print(f'load model from {path}...')
+        print(f'\tload model from {path}...')
         model.load_state_dict(torch.load(path))
         return True
-    print(f'no model in {path}...')
+    print(f'\tno model in {path}...')
     return False
 
-def inference(ff_model, bp_model, dataLoader, device: str) -> tuple[list, list]:
+def train(ff_model: Module, bp_model: Module, dataLoader: mnistDataLoader, device: str) -> None:
+    ff_loss, bp_loss = list(), list()
+
+    ff_model.train()
+    bp_model.train()
+    dataLoader = iter(dataLoader)
+    for (x0, y0), (x1, y1) in zip(dataLoader, dataLoader):
+        x0, y0 = x0.to(device), y0.to(device)
+        x1, y1 = x1.to(device), y1.to(device)
+        
+        bp_loss.append(bp_model.update(x0, y0).item())
+        bp_loss.append(bp_model.update(x1, y1).item())
+
+
+        print(bp_loss)
+        
+        raise
+        
+    raise
+
+def inference(ff_model: Module, bp_model: Module, dataLoader: mnistDataLoader, device: str) -> tuple[float, float]:
     ff_acc, bp_acc = list(), list()
 
     ff_model.eval()
@@ -44,7 +65,10 @@ def inference(ff_model, bp_model, dataLoader, device: str) -> tuple[list, list]:
 
             ff_y_hat = ff_model.inference(x).argmax(dim=1)
             bp_y_hat = bp_model.inference(x).argmax(dim=1)
-    return ff_acc, bp_acc
+
+            ff_acc.extend(ff_y_hat.eq(y).float().tolist())
+            bp_acc.extend(bp_y_hat.eq(y).float().tolist())
+    return sum(ff_acc) / len(ff_acc), sum(bp_acc) / len(bp_acc)
 
 
 if __name__ == '__main__':
@@ -59,15 +83,17 @@ if __name__ == '__main__':
     ff_model = models.FFModel(dims=args.ff_dims, optimizer=get_optim(args), lr=args.lr, device=DEVICE)
     bp_model = models.BPModel(dims=args.bp_dims, optimizer=get_optim(args), lr=args.lr, device=DEVICE)
 
-    
-    if args.mode == 'INFERENCE': #INFERENCE
-        load_model(ff_model, FF_PATH)
-        load_model(bp_model, BP_PATH)
+    print(f'+ Load Model')
+    load_model(ff_model, FF_PATH)
+    load_model(bp_model, BP_PATH)
 
+    if args.mode == 'TRAIN':
+        train_dataLoader = mnistDataLoader.get_loader(train=True, batch_size=args.train_batch_size)
+        train(ff_model, bp_model, train_dataLoader, device=DEVICE)
+
+    elif args.mode == 'INFERENCE':
+        print(f'\n+ Accuracy on MNIST Test Set')
         test_dataLoader = mnistDataLoader.get_loader(train=False, batch_size=args.test_batch_size)
         ff_acc, bp_acc = inference(ff_model, bp_model, test_dataLoader, device=DEVICE)
-        print(ff_acc, bp_acc)
-        raise
-
-    elif args.mode == 'TRAIN': #TRAIN
-        print('train')
+        print(f'\tFF Model: {ff_acc:.3f}')
+        print(f'\tBP Model: {bp_acc:.3f}')
