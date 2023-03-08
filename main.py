@@ -21,7 +21,15 @@ def get_args() -> argparse.Namespace:
     parser.add_argument('--device', type=str, default='CPU', choices=('CPU', 'CUDA'))
     return parser.parse_args()
 
-def get_optim(args) -> optim:
+def print_set_info(args: argparse.Namespace) -> None:
+    print('\n\n')
+    print(f'SETTING INFO'.center(60, '='))
+    print(f'+ Mode: {args.mode}({args.device})')
+    print(f'+ Optimizer: {args.optimizer}(lr={args.lr:.3f})', end='\n\n')
+    print(f'+ Batch size\n\t* Train: {args.train_batch_size}\n\t* Test: {args.test_batch_size}', end='\n\n')
+    print(f'+ Model shape\n\t* FF-Model:  {args.ff_dims}\n\t* BP-Model:  {args.bp_dims}', end='\n\n')
+
+def get_optim(args: argparse.Namespace) -> optim:
     if args.optimizer == 'SGD':
         return optim.SGD
     return optim.Adam
@@ -54,7 +62,6 @@ def train(ff_model: Module, bp_model: Module, dataLoader: mnistDataLoader, devic
             neg_x=x1, neg_y=y1, #negative data
         ))
     
-
 def inference(ff_model: Module, bp_model: Module, dataLoader: mnistDataLoader, device: str) -> tuple[float, float]:
     ff_acc, bp_acc = list(), list()
 
@@ -80,13 +87,15 @@ if __name__ == '__main__':
     DEVICE = args.device.lower()
 
 
-    print(f'+ MODEL SHAPE\n\tFF-Model:  {args.ff_dims}\n\tBP-Model:  {args.bp_dims}', end='\n\n')
+    print_set_info(args)
     ff_model = models.FFModel(dims=args.ff_dims, optimizer=get_optim(args), lr=args.lr, device=DEVICE)
     bp_model = models.BPModel(dims=args.bp_dims, optimizer=get_optim(args), lr=args.lr, device=DEVICE)
+
 
     print(f'+ Load Model')
     load_model(ff_model, FF_PATH)
     load_model(bp_model, BP_PATH)
+    print(f'=' * 60)
 
     if args.mode == 'TRAIN':
         train_dataLoader = mnistDataLoader.get_loader(train=True, batch_size=args.train_batch_size)
@@ -94,7 +103,14 @@ if __name__ == '__main__':
 
     elif args.mode == 'INFERENCE':
         test_dataLoader = mnistDataLoader.get_loader(train=False, batch_size=args.test_batch_size)
+        print('\n\n')
+        print(f'INFERENCE'.center(60, '='))
         ff_acc, bp_acc = inference(ff_model, bp_model, test_dataLoader, device=DEVICE)
-        print(f'\n+ Accuracy on MNIST Test Set')
+        print('=' * 60)
+
+        print('\n\n')
+        print(f'INFERENCE RESULT'.center(60, '='))
+        print(f'+ Accuracy on MNIST Test Set')
         print(f'\tFF Model: {ff_acc:.3f}')
         print(f'\tBP Model: {bp_acc:.3f}')
+        print('=' * 60)
