@@ -25,7 +25,7 @@ class FFLinear(nn.Linear):
         out = F.linear(out, self.weight, self.bias)
         return self.activation(out)
     
-    def update(self, pos_x, neg_x) -> tuple[Tensor, tuple[Tensor, Tensor]]:
+    def update(self, pos_x, neg_x) -> tuple[Tensor, Tensor]:
         pos_out = self.forward(pos_x).pow(exponent=2).mean(dim=1) #shape: (Batch, )
         neg_out = self.forward(neg_x).pow(exponent=2).mean(dim=1) #shape: (Batch, )
         
@@ -35,7 +35,7 @@ class FFLinear(nn.Linear):
         self.optim.zero_grad()
         loss.backward()
         self.optim.step()
-        return loss, (self.forward(pos_x).detach(), self.forward(neg_x).detach())
+        return self.forward(pos_x).detach(), self.forward(neg_x).detach()
     
     def __layerNorm(self, input: Tensor, eps: float=1e-4) -> Tensor:
         '''

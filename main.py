@@ -1,8 +1,10 @@
 import os
-from tqdm import tqdm
 import argparse
+from tqdm import tqdm
+from matplotlib import pyplot as plt
 
 import torch
+from torch import Tensor
 from torch import optim
 from torch.nn import Module
 
@@ -14,10 +16,11 @@ def get_args() -> argparse.Namespace:
     parser.add_argument('--mode', type=str, default='INFERENCE', choices=('INFERENCE', 'TRAIN'))
     parser.add_argument('--ff_dims', type=int, default=[28*28, 100, 10], nargs='+')
     parser.add_argument('--bp_dims', type=int, default=[28*28, 100, 10], nargs='+')
+    parser.add_argument('--epoch', type=int, default=1)
     parser.add_argument('--train_batch_size', type=int, default=1)
     parser.add_argument('--test_batch_size', type=int, default=1)
     parser.add_argument('--optimizer', type=str, default='SGD', choices=('SGD', 'ADAM'))
-    parser.add_argument('--lr', type=float, default=0.01)
+    parser.add_argument('--lr', type=float, default=0.1)
     parser.add_argument('--device', type=str, default='CPU', choices=('CPU', 'CUDA'))
     return parser.parse_args()
 
@@ -25,6 +28,7 @@ def print_set_info(args: argparse.Namespace) -> None:
     print('\n\n')
     print(f'SETTING INFO'.center(60, '='))
     print(f'+ Mode: {args.mode}({args.device})')
+    print(f'+ Epoch: {args.epoch}', end='\n\n')
     print(f'+ Optimizer: {args.optimizer}(lr={args.lr:.3f})', end='\n\n')
     print(f'+ Batch size\n\t* Train: {args.train_batch_size}\n\t* Test: {args.test_batch_size}', end='\n\n')
     print(f'+ Model shape\n\t* FF-Model:  {args.ff_dims}\n\t* BP-Model:  {args.bp_dims}', end='\n\n')
@@ -42,25 +46,34 @@ def load_model(model: Module, path: str) -> bool:
     print(f'\tno model in {path}...')
     return False
 
+def get_neg_y(y: Tensor, class_num: int=10) -> Tensor:
+    device = y.device
+    batch_size = y.size(0)
+    
+    able_idxs = torch.arange(class_num).unsqueeze(0).repeat(batch_size, 1).to(device)
+    able_idxs = able_idxs[able_idxs != y.view(batch_size, 1)].view(batch_size, class_num-1)
+    
+    rand_idxs = torch.randint(class_num - 1, size=(batch_size, ))
+    return able_idxs[range(batch_size), rand_idxs]
+
 def train(ff_model: Module, bp_model: Module, dataLoader: mnistDataLoader, device: str) -> None:
     dataset_size = dataLoader.__len__()
-    ff_loss, bp_loss = list(), list()
 
     ff_model.train()
     bp_model.train()
-    dataLoader = iter(dataLoader)
-    for (x0, y0), (x1, y1) in tqdm(zip(dataLoader, dataLoader), total=dataset_size//2):
+    loaderIter = iter(dataLoader)
+    for (x0, y0), (x1, y1) in tqdm(zip(loaderIter, loaderIter), total=dataset_size//2):
         #x0, y0 is for positive data
         #x1, y1 is for negative data
         x0, y0 = x0.to(device), y0.to(device)
         x1, y1 = x1.to(device), y1.to(device)
         
-        bp_loss.append(bp_model.update(x0, y0).item())
-        bp_loss.append(bp_model.update(x1, y1).item())
-        ff_loss.append(ff_model.update(
+        bp_model.update(x0, y0)
+        bp_model.update(x1, y1)
+        ff_model.update(
             pos_x=x0, pos_y=y0, #positive data
-            neg_x=x1, neg_y=y1, #negative data
-        ))
+            neg_x=x1, neg_y=get_neg_y(y1), #negative data
+        )
     
 def inference(ff_model: Module, bp_model: Module, dataLoader: mnistDataLoader, device: str) -> tuple[float, float]:
     ff_acc, bp_acc = list(), list()
@@ -98,13 +111,30 @@ if __name__ == '__main__':
     print(f'=' * 60)
 
     if args.mode == 'TRAIN':
-        train_dataLoader = mnistDataLoader.get_loader(train=True, batch_size=args.train_batch_size)
-        train(ff_model, bp_model, train_dataLoader, device=DEVICE)
+        ff_acces, bp_acces = list(), list()
+
+        print('\n\n')
+        print(f'TRAIN MODEL'.center(60, '='))
+        for _ in range(args.epoch):
+            train_dataLoader = mnistDataLoader.get_loader(train=True, batch_size=args.train_batch_size)
+            train(ff_model, bp_model, train_dataLoader, device=DEVICE)
+
+            test_dataLoader = mnistDataLoader.get_loader(train=False, batch_size=args.test_batch_size)
+            ff_acc, bp_acc = inference(ff_model, bp_model, test_dataLoader, device=DEVICE)
+            ff_acces.append(ff_acc)
+            bp_acces.append(bp_acc)
+        
+        print('=' * 60)
+        plt.subplot(1, 2, 1)
+        plt.plot(ff_acces)
+        plt.subplot(1, 2, 2)
+        plt.plot(bp_acces)
+        plt.show()
 
     elif args.mode == 'INFERENCE':
-        test_dataLoader = mnistDataLoader.get_loader(train=False, batch_size=args.test_batch_size)
         print('\n\n')
         print(f'INFERENCE'.center(60, '='))
+        test_dataLoader = mnistDataLoader.get_loader(train=False, batch_size=args.test_batch_size)
         ff_acc, bp_acc = inference(ff_model, bp_model, test_dataLoader, device=DEVICE)
         print('=' * 60)
 

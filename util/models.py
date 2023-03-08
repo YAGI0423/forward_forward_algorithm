@@ -27,14 +27,13 @@ class BPModel(nn.Module):
     def inference(self, input: Tensor) -> Tensor:
         return self.forward(input)\
         
-    def update(self, x: Tensor, y: Tensor) -> Tensor:
+    def update(self, x: Tensor, y: Tensor) -> None:
         y_hat = self.forward(x)
         loss = self.loss_fc(y_hat, y)
 
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
-        return loss
     
 
 class FFModel(FFM):
@@ -56,16 +55,14 @@ class FFModel(FFM):
         goodness = self.forward(input_).view(batch_size, -1)
         return goodness
     
-    def update(self, pos_x: Tensor, pos_y: Tensor, neg_x: Tensor, neg_y: Tensor) -> Tensor:
+    def update(self, pos_x: Tensor, pos_y: Tensor, neg_x: Tensor, neg_y: Tensor) -> None:
         pos_input = self.__combine_xy(pos_x, pos_y)
         neg_input = self.__combine_xy(neg_x, neg_y)
-        
-        loss_mean = torch.tensor([0.]).to(pos_x.device)
+
         pos_o, neg_o = pos_input, neg_input
-        for idx, layer in enumerate(self.layers):
-            loss, (pos_o, neg_o) = layer.update(pos_o, neg_o)
-            loss_mean += loss
-        return loss_mean / idx
+        for layer in self.layers:
+            pos_o, neg_o = layer.update(pos_o, neg_o)
+
 
     def __combine_xy(self, x: Tensor, y: Tensor) -> Tensor:
         '''
