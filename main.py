@@ -128,9 +128,9 @@ if __name__ == '__main__':
             ff_acc, bp_acc = inference(ff_model, bp_model, test_dataLoader, device=DEVICE)
             ff_acces.append(ff_acc)
             bp_acces.append(bp_acc)
+        print('=' * 60)
         
         #save figure of accuracy
-        print('=' * 60)
         plt.subplot(1, 2, 1)
         plt.plot(ff_acces)
         plt.subplot(1, 2, 2)
