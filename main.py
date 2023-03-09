@@ -47,6 +47,11 @@ def load_model(model: Module, path: str) -> bool:
     return False
 
 def get_neg_y(y: Tensor, class_num: int=10) -> Tensor:
+    '''
+    return random label 'negative y', except real label
+    + input shape: (Batch, )
+    + output shape: (Batch, )
+    '''
     device = y.device
     batch_size = y.size(0)
     
@@ -104,12 +109,12 @@ if __name__ == '__main__':
     ff_model = models.FFModel(dims=args.ff_dims, optimizer=get_optim(args), lr=args.lr, device=DEVICE)
     bp_model = models.BPModel(dims=args.bp_dims, optimizer=get_optim(args), lr=args.lr, device=DEVICE)
 
-
     print(f'+ Load Model')
     load_model(ff_model, FF_PATH)
     load_model(bp_model, BP_PATH)
     print(f'=' * 60)
 
+    ff_acc, bp_acc = None, None
     if args.mode == 'TRAIN':
         ff_acces, bp_acces = list(), list()
 
@@ -124,12 +129,15 @@ if __name__ == '__main__':
             ff_acces.append(ff_acc)
             bp_acces.append(bp_acc)
         
+        #save figure of accuracy
         print('=' * 60)
         plt.subplot(1, 2, 1)
         plt.plot(ff_acces)
         plt.subplot(1, 2, 2)
         plt.plot(bp_acces)
         plt.show()
+
+        #save model
 
     elif args.mode == 'INFERENCE':
         print('\n\n')
@@ -138,9 +146,11 @@ if __name__ == '__main__':
         ff_acc, bp_acc = inference(ff_model, bp_model, test_dataLoader, device=DEVICE)
         print('=' * 60)
 
-        print('\n\n')
-        print(f'INFERENCE RESULT'.center(60, '='))
-        print(f'+ Accuracy on MNIST Test Set')
-        print(f'\tFF Model: {ff_acc:.3f}')
-        print(f'\tBP Model: {bp_acc:.3f}')
-        print('=' * 60)
+
+    #common code of Train & Inference
+    print('\n\n')
+    print(f'INFERENCE RESULT'.center(60, '='))
+    print(f'+ Accuracy on MNIST Test Set')
+    print(f'\tFF Model: {ff_acc:.3f}')
+    print(f'\tBP Model: {bp_acc:.3f}')
+    print('=' * 60)
