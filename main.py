@@ -17,13 +17,22 @@ def get_args() -> argparse.Namespace:
     parser.add_argument('--mode', type=str, default='INFERENCE', choices=('INFERENCE', 'TRAIN'))
     parser.add_argument('--ff_dims', type=int, default=[28*28, 100, 10], nargs='+')
     parser.add_argument('--bp_dims', type=int, default=[28*28, 100, 10], nargs='+')
-    parser.add_argument('--epoch', type=int, default=5)
+    parser.add_argument('--epoch', type=int, default=10)
     parser.add_argument('--train_batch_size', type=int, default=16)
     parser.add_argument('--test_batch_size', type=int, default=256)
     parser.add_argument('--optimizer', type=str, default='SGD', choices=('SGD', 'ADAM'))
     parser.add_argument('--lr', type=float, default=0.1)
     parser.add_argument('--device', type=str, default='CUDA', choices=('CPU', 'CUDA'))
+    parser.add_argument('--seed', type=int, default=23)
     return parser.parse_args()
+
+def seed_everything(seed: int) -> None:
+    # random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = True
 
 def print_set_info(args: argparse.Namespace) -> None:
     print('\n\n')
@@ -102,19 +111,19 @@ def inference(ff_model: Module, bp_model: Module, dataLoader: DataLoader, device
             ff_acces.extend(ff_acc)
             bp_acces.extend(bp_acc)
 
-            tqdm_loader.set_description(f'ff ACC({get_mean(ff_acc):.3f}), bp ACC({get_mean(bp_acc):.3f})')
+            tqdm_loader.set_description(f'ff ACC({get_mean(ff_acces):.3f}), bp ACC({get_mean(bp_acces):.3f})')
     return get_mean(ff_acces), get_mean(bp_acces)
 
 
 if __name__ == '__main__':
-    args = get_args()
     MODEL_HOME = './trained_model'
     FF_PATH = os.path.join(MODEL_HOME, 'ff_model.pk')
     BP_PATH = os.path.join(MODEL_HOME, 'bp_model.pk')
     FIGURE_HOME = './figures'
+    args = get_args()
     DEVICE = args.device.lower()
 
-
+    seed_everything(args.seed)
     print_set_info(args)
     ff_model = models.FFModel(dims=args.ff_dims, optimizer=get_optim(args), lr=args.lr, device=DEVICE)
     bp_model = models.BPModel(dims=args.bp_dims, optimizer=get_optim(args), lr=args.lr, device=DEVICE)
