@@ -3,7 +3,7 @@ from torch import nn
 from torch import optim
 from torch import Tensor
 
-from ffmodel import FFModel as FFM
+from models.ffmodel import FFModel as FFM
 
 
 class BPModel(nn.Module):

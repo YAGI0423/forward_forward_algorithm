@@ -130,4 +130,4 @@ dmypy.json
 
 #personal
 mnist/
-model/*
+trained_model/*
