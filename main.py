@@ -151,6 +151,7 @@ if __name__ == '__main__':
             print('')
         print('=' * 60)
         
+        
         #save figure of accuracy
         utils.save_plot(  
             ff_acces, bp_acces, figure_path=os.path.join(FIGURE_HOME, 'figure1_accuracy_on_testset.png')
