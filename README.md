@@ -28,7 +28,7 @@
 &nbsp;&nbsp;
 본 프로젝트는 MNIST 데이터셋에 대한 Geoffrey Hinton이 제시한 Forward-Forward 알고리즘과 Back Propagation 알고리즘의 정확도를 비교하는 것을 목표로 한다. 두 알고리즘 모두 '784-100-10' 형태의 Fully-Connected 층으로 이루어진 모델을 사용하였으며, 배치 크기는 16으로 설정하고 학습률이 0.1인 확률적 경사 하강법(SGD)으로 총 10회 학습하였다. figure 1은 학습에 따른 테스트 데이터셋에 대한 두 알고리즘의 정확도(Accuracy)를 제시한 것이다.
 
-<br><img src='./figures/figure1_accuracy_on_testset.png' height='230'>
+<br><img src='./figures/figure1_accuracy_on_testset.png' height='330'>
 
 **figure 1.** Accuracy on MNIST Test Set
 
