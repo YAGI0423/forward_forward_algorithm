@@ -37,7 +37,6 @@
 
 ## Getting Start
 ***
-<br>
 
 ### 매개변수 확인하기
 ```python
