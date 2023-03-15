@@ -3,7 +3,7 @@
 ***
 작성자: YAGI<br>
 
-최종 수정일: 2023-03-14
+최종 수정일: 2023-03-15
 + 2023.03.13: 코드 작성 완료
 + 2023.03.15: README 작성 완료
 + 2023.03.15: 프로젝트 종료
@@ -22,13 +22,13 @@
 
 > Geoffrey Hinton. The Forward-Forward Algorithm: Some Preliminary Investigations. [ArXiv, 2212.13345v1, 2022](https://arxiv.org/pdf/2212.13345v1.pdf).
 
-> "pytorch_forward_forward". github. last commit Jan 17, 2022, [https://github.com/mohammadpz/pytorch_forward_forward](https://github.com/mohammadpz/pytorch_forward_forward).
+> "pytorch_forward_forward". github. last commit Jan 17, 2023, [https://github.com/mohammadpz/pytorch_forward_forward](https://github.com/mohammadpz/pytorch_forward_forward).
 ***
 <br><br>
 
 ## 프로젝트 요약
 &nbsp;&nbsp;
-본 프로젝트는 MNIST 데이터셋에 대한 Geoffrey Hinton이 제시한 Forward-Forward 알고리즘과 Back Propagation 알고리즘의 정확도를 비교하는 것을 목표로 한다. 두 알고리즘 모두 '784-100-10' 형태의 Fully-Connected 층으로 이루어진 모델을 사용하였으며, 배치 크기는 16으로 설정하고 학습률이 0.1인 확률적 경사 하강법(SGD)으로 총 10회 학습하였다. figure 1은 학습에 따른 테스트 데이터셋에 대한 두 알고리즘의 정확도(Accuracy)를 제시한 것이다.
+본 프로젝트는 Geoffrey Hinton이 제시한 Forward-Forward 알고리즘과 Back Propagation 알고리즘의 MNIST 데이터셋에 대한 정확도를 비교하는 것을 목표로 한다. 두 알고리즘 모두 '784-100-10' 형태의 Fully-Connected 층으로 이루어진 모델을 사용하였으며, 배치 크기는 16으로 설정하고 학습률이 0.1인 확률적 경사 하강법(SGD)으로 총 10회 학습하였다. figure 1은 학습에 따른 테스트 데이터셋에 대한 두 알고리즘의 정확도(Accuracy)를 제시한 것이다.
 
 <br><img src='./figures/figure1_accuracy_on_testset.png' height='330'>
 
